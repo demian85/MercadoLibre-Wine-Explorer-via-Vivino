@@ -26,7 +26,12 @@ function closeSuggestMenu() {
 
 function buildThumbailUrl(imageName) {
   if (!imageName) return 'https://images.vivino.com/thumbs/default_label_80x80.jpg';
-  const path = imageName.replace(/^\w+\//, '').replace(/(\w+)(?:\.(jpg|jpeg|png))?$/, '$1_80x80.$2');
+  const path = imageName
+    .replace(/^\w+\//, '')
+    .replace(/(\w+)(?:\.(jpg|jpeg|png))?$/, (match, m1, m2) => {
+      const ext = m2 || 'png';
+      return `${m1}_80x80.${ext}`;
+    });
   return `https://images.vivino.com/thumbs/${path}`;
 }
 
