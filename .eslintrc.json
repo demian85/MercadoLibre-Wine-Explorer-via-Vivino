@@ -1,0 +1,17 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 8
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "no-console": 0
+  },
+  "globals": {
+    "chrome": true
+  }
+}
