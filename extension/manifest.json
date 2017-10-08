@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "MercadoLibre Wine Explorer via Vivino",
   "description": "Integración de Vivino.com con MercadoLibre",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Demián Andrés Rodriguez",
   "permissions": ["tabs"],
   "content_scripts": [
