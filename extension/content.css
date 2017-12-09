@@ -6,6 +6,12 @@ img.mlwe-icon {
   border: 0 !important;
   cursor: pointer !important;
   transition: transform 0.1s ease;
+  margin: 5px;
+  vertical-align: middle;
+}
+
+.mlwe-icon-single-view {
+
 }
 
 img.mlwe-icon:hover {

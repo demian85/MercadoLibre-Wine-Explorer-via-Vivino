@@ -61,25 +61,64 @@ function openSuggestMenu(title, results, x, y) {
   });
 }
 
+const createIcon = (clickHandler, className) => {
+  const img = new Image();
+  img.src = chrome.runtime.getURL('/images/logo-96.png');
+  img.title = 'Buscar en Vivino';
+  img.className = 'mlwe-icon';
+  if (className) {
+    img.classList.add(className);
+  }
+  img.addEventListener('click', clickHandler);
+  return img;
+};
+
 function addIcons() {
-  const src = chrome.runtime.getURL('/images/logo-96.png');
-  const items = document.querySelectorAll('#searchResults > li .rowItem');
-  items.forEach((item) => {
-    const img = new Image();
-    img.src = src;
-    img.title = 'Buscar en Vivino';
-    img.className = 'mlwe-icon';
-    img.addEventListener('click', handleClick);
-    item.appendChild(img);
-  });
+
+  const isWineItemView = !!Array.from(document.querySelectorAll('.vip-navigation-breadcrumb-list > li'))
+    .map(node => node.textContent.trim())
+    .find(text => text.toLowerCase() === 'vinos');
+
+  if (isWineItemView) {
+    // single item view
+    const root = document.querySelector('.vip-action-primary');
+    if (root) {
+      const icon = createIcon((e) => {
+        const wineName = document.querySelector('.item-title').textContent;
+        handleClick(e.target, wineName);
+      }, 'mlwe-icon-single-view');
+      root.appendChild(icon);
+    }
+  } else {
+    // list view
+    const items = document.querySelectorAll('#searchResults > li .rowItem');
+    items.forEach((item) => {
+      const icon = createIcon((e) => {
+        const wineName = e.target.parentNode.querySelector('.item__title a').textContent;
+        handleClick(e.target, wineName);
+      }, 'mlwe-icon-list-view');
+      item.appendChild(icon);
+    });
+  }
+}
+
+async function handleClick(srcIcon, wineName) {
+  const iconBounds = srcIcon.getBoundingClientRect();
+  const query = findWineName(wineName);
+  const results = await doSearch(query);
+  const title = results.length > 0 ? 'Resultados encontrados...' : 'No se han encontrado resultados :(';
+  const rightX = document.documentElement.scrollLeft + document.body.clientWidth - iconBounds.right;
+  const topY = document.documentElement.scrollTop + iconBounds.bottom;
+  openSuggestMenu(title, results, rightX, topY);
 }
 
 async function doSearch(query) {
+  console.log(`Searching for wine "${query}"...`);
   const url = `https://9takgwjuxl-dsn.algolia.net/1/indexes/WINES/query?x-algolia-agent=Algolia%20for%20vanilla%20JavaScript%20(lite)%203.24.5&x-algolia-application-id=9TAKGWJUXL&x-algolia-api-key=60c11b2f1068885161d95ca068d3a6ae`;
   const res = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({
-      "params":`query=${encodeURIComponent(query)}&hitsPerPage=6`
+      "params": `query=${encodeURIComponent(query)}&hitsPerPage=6`
     })
   });
   if (res.ok) {
@@ -87,17 +126,6 @@ async function doSearch(query) {
     return results.hits;
   }
   return [];
-}
-
-async function handleClick(e) {
-  const text = e.target.parentNode.querySelector('.item__title a').textContent;
-  const iconBounds = e.target.getBoundingClientRect();
-  const query = findWineName(text);
-  const results = await doSearch(query);
-  const title = results.length > 0 ? 'Resultados encontrados...' : 'No se han encontrado resultados :(';
-  const rightX = document.documentElement.scrollLeft + document.body.clientWidth - iconBounds.right;
-  const topY = document.documentElement.scrollTop + iconBounds.bottom;
-  openSuggestMenu(title, results, rightX, topY);
 }
 
 function findWineName(text) {
@@ -110,8 +138,8 @@ function findWineName(text) {
     .replace(/ó/g, 'o')
     .replace(/ú/g, 'u')
     .replace(/\d+(x\d+)? *(ml|cc|cm3)/, '')
-    .replace(/\b(liquido|envios?|mercado ?envios|caja|box|solo|bebidas?|(gran )?oferta)\b/g, '')
-    .replace(/[^a-z0-9 _-]/g, '')
+    .replace(/\b(liquido|gratis|envios?|mercado ?envios|caja|box|solo|bebidas?|(gran )?oferta)\b/g, '')
+    .replace(/[^a-zñ0-9 _-]/g, '')
     .replace(/- *$/, '')
     .trim();
   return name;

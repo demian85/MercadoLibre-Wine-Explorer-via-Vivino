@@ -2,13 +2,14 @@
   "manifest_version": 2,
   "name": "MercadoLibre Wine Explorer via Vivino",
   "description": "Integración de Vivino.com con MercadoLibre",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": "Demián Andrés Rodriguez",
   "permissions": ["tabs"],
   "content_scripts": [
     {
       "matches": [
         "*://listado.mercadolibre.com.ar/alimentos-bebidas/vinos/*",
+        "*://articulo.mercadolibre.com.ar/*",
         "*://listado.mercadolibre.cl/otras-categorias/alimentos-bebidas/bebidas-alcoholicas/vinos/*"
       ],
       "css": ["content.css"],
